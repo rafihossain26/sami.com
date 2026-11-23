@@ -21,13 +21,13 @@ jobs:
           npm init -y
           npm install electron@28 electron-builder@24 --save-dev
           echo "const { app, BrowserWindow } = require('electron'); app.whenReady().then(() => { const win = new BrowserWindow({ width: 1280, height: 800, autoHideMenuBar: true }); win.loadFile('index.html'); });" > main.js
-          node -e "const pkg = require('./package.json'); pkg.name = 'sobuj-pos'; pkg.version = '1.0.0'; pkg.description = 'Sobuj POS'; pkg.author = 'Rafi'; pkg.main = 'main.js'; pkg.build = { appId: 'com.sobuj.pos', productName: 'Sobuj-POS', win: { target: 'portable' } }; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
-          npx electron-builder --win
+          node -e "const pkg = require('./package.json'); pkg.name = 'sobuj-pos'; pkg.version = '1.0.0'; pkg.description = 'Sobuj POS'; pkg.author = 'Rafi'; pkg.main = 'main.js'; pkg.build = { appId: 'com.sobuj.pos', productName: 'Sobuj-POS', artifactName: '\${productName}-\${version}-win-x64.\${ext}', win: { target: 'nsis' } }; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+          npx electron-builder --win --x64
       - name: Upload Windows EXE
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.0
-          files: win-app/dist/*.exe
+          files: win-app/dist/*-win-x64.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -55,10 +55,11 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk ../Sobuj-POS-1.0.0-android.apk
       - name: Upload Android APK
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.0
-          files: android-app/android/app/build/outputs/apk/debug/app-debug.apk
+          files: android-app/Sobuj-POS-1.0.0-android.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
